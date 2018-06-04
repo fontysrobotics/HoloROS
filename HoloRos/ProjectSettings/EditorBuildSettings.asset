@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/scene1.unity
+    path: Assets/Scenes/FirstUI.unity
     guid: fb0aa766d0fa4364688dd3e228878dc9
-  - enabled: 1
-    path: Assets/Main.unity
-    guid: d585660e9feea4b40b7d2205d9b1e16c
   - enabled: 0
-    path: Assets/DynamicUI.unity
-    guid: ca80a5fde9aadd3498ea0c4d45c62d8d
+    path: Assets/Scenes/MoveBlock.unity
+    guid: d585660e9feea4b40b7d2205d9b1e16c
+  - enabled: 1
+    path: Assets/Scenes/HoloLensToROS.unity
+    guid: 814fe8e68010ac74bb70eef0a3e4ad26
