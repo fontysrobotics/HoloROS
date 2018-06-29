@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/MoveBlock.unity
     guid: d585660e9feea4b40b7d2205d9b1e16c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/HoloLensToROS.unity
     guid: 814fe8e68010ac74bb70eef0a3e4ad26
+  - enabled: 1
+    path: Assets/ur5control.unity
+    guid: 77eca27774daf9542987aa5bdcbd223f

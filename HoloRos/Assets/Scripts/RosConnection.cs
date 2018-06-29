@@ -1,204 +1,109 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-//using System.Net.WebSockets;
-using System;
-using System.Text;
-
 using UnityEngine;
-using UnityEngine.UI;
+
 using Newtonsoft.Json;
-//using WebSocket4Net;
+using Newtonsoft.Json.Linq;
 using RosTypes;
 
 #if UNITY_EDITOR
-using WebSocketSharp;
+using UWPEditor;
 #endif
 
 #if !UNITY_EDITOR
-//using Websockets;
-using Windows.Networking.Sockets;
-using Windows.Storage.Streams;
-using Windows.Networking;
-using Windows.Foundation;
-using Windows.UI.Core;	
+using UWPHoloLens;
 #endif
 
-
-public class RosConnection : MonoBehaviour
+public class RosConnection
 {
-	//public int linear;
-	//public int angular;
-	//public InputField lin;
-	//public InputField ang;
-	private const string url = "ws://145.93.170.42:9090";
-	public Text text;
-	string t;
+	private const string url = "ws://145.93.173.18:9090";
+	private WebsocketConnection connection;
 
-	public Integer linear;
-	public Integer angular;
-	
-	 public bool con;
+	private Dictionary<string, CallbackDelegate> callbacks;
 
-	//ClientWebSocket w;
-	//Uri uri;
-	//ArraySegment<byte> arr;
+	public delegate void CallbackDelegate(string data);
 
-#if UNITY_EDITOR
-	private WebSocket websocketClient;
-#endif
-#if !UNITY_EDITOR
-	//private IWebSocketConnection connection;
-	    private MessageWebSocket messageWebSocket;
-    Uri server;
-    DataWriter dataWriter;
-#endif
-
-	void Awake()
+	public RosConnection()
 	{
-		//w = new ClientWebSocket();
-		//uri = new Uri("ws://145.93.174.31:9090");
-		//setArray();
-
-		//websocketClient = new WebSocket("ws://192.168.42.132:9090");
-#if UNITY_EDITOR
-		websocketClient = new WebSocket(url);
-		websocketClient.Connect();
-		websocketClient.Send(getJson());
-#endif
-text.text = "Got here!";
-#if !UNITY_EDITOR
-		con = false;
-		
-#endif
-		//websocketClient.OnMessage += new EventHandler<WebSocketSharp.MessageEventArgs>(websocketClient_OnMessage);
-
-		//websocketClient.OnMessage += new EventHandler<MessageReceivedEventArgs>(websocketClient_MessageReceived);
-
-	}
-
-	void Update()
-	{
-		//text.text = t;
-		//text.text = "Got here!";
-		#if UNITY_EDITOR
-		text.text = "Editro! here!";
-#endif
-
-#if !UNITY_EDITOR
-		//text.text = "UWP here!";
-#endif
-	}
-
-	public void Open()
-	{
-		//websocketClient.Connect();
-#if !UNITY_EDITOR
-		//Websockets.Universal.WebsocketConnection.Link();
-		//connection = Websockets.WebSocketFactory.Create();
-		//connection.OnMessage += Connection_OnMessage;
-		//connection.Open(url);
-		
-		messageWebSocket = new MessageWebSocket();
-
-        server = new Uri(url);
-
-        IAsyncAction outstandingAction = messageWebSocket.ConnectAsync(server);
-        AsyncActionCompletedHandler aach = new AsyncActionCompletedHandler(NetworkConnectedHandler);
-        outstandingAction.Completed = aach;
-#endif
+		callbacks = new Dictionary<string, CallbackDelegate>();
+		connection = new WebsocketConnection(url);
 	}
 	
-	
-//Successfull network connection handler on HL
-#if !UNITY_EDITOR
-    public void NetworkConnectedHandler(IAsyncAction asyncInfo, AsyncStatus status)
-    {
-        // Status completed is successful.
-        if (status == AsyncStatus.Completed)
-        {
-            //Guarenteed connection
-            con = true;
-            
-            //Creating the writer that will be repsonsible to send a message through Rosbridge
-            dataWriter = new DataWriter(messageWebSocket.OutputStream);
-
-        }
-        else
-        {
-            con = false;
-        }
-    }
-#endif
-
-
-	public void Send()
+	public void OpenConnection()
 	{
-
-		//websocketClient.Send(getJson());
-#if !UNITY_EDITOR
-		//connection.Send(getJson());
-		if (messageWebSocket != null)
-        {
-            //string s = CallService(service, args);
-            dataWriter.WriteString(getJson());
-            dataWriter.StoreAsync();
-        }
-#endif
-
+		connection.Open();
+		connection.SetCallback(MessageReceived);
 	}
-
-	public void Subscribe()
+	
+	public void CloseConnection()
 	{
-		SubscribeMessage s = new SubscribeMessage("subscribe", "/turtle1/pose");
-		s.throttle_rate = 0;
-		s.queue_length = 1;
+		connection.Close();
+	}
+	
+	public void Subscribe(string topic, CallbackDelegate cb, int throttle = 0)
+	{
+		callbacks.Add(topic, cb);
+
+		SubscribeMessage s = new SubscribeMessage("subscribe", topic);
+		s.throttle_rate = throttle;
 		string json = JsonConvert.SerializeObject(s);
 
-		//websocketClient.Send(json);
+		connection.Send(json);
 	}
 
-	public void Stop()
+	public void Publish(RosMsg msg, string topic)
 	{
-		//websocketClient.Close();
-#if !UNITY_EDITOR
-		//connection.Close();
-		 messageWebSocket.Dispose();
-        messageWebSocket = null;
-        con = false;
-#endif
-	}
-	private void Connection_OnMessage(string msg)
-	{
-
-	}
-
-	//private void websocketClient_OnMessage(object sender, WebSocketSharp.MessageEventArgs e)
-	//{
-	//	t = e.Data;
-	//}
-
-	//private void websocketClient_MessageReceived(object sender, MessageReceivedEventArgs e)
-	//{
-	//	t = e.Message;
-	//}
-
-	private string getJson()
-	{
-		geometry_msgs_twist t = new geometry_msgs_twist();
-		geometry_msgs_vector3 linearVector = new geometry_msgs_vector3();
-		geometry_msgs_vector3 angularVector = new geometry_msgs_vector3();
-		//linearVector.x = linear.integer;
-		//angularVector.z = angular.integer;
-		linearVector.x = 1;
-		angularVector.z = 0;
-		t.linear = linearVector;
-		t.angular = angularVector;
-		PublishMessage p = new PublishMessage("publish", "/turtle1/cmd_vel", t);
+		PublishMessage p = new PublishMessage("publish", topic, msg);
 		string json = JsonConvert.SerializeObject(p);
-		//string json = "";
-		this.t = json;
-		return json;
-		//return "";
+		connection.Send(json);
 	}
+
+	public void MessageReceived(object e, WebSocketSharp.MessageEventArgs args)
+	{
+		string topic = "";
+		JObject jsonObject = JObject.Parse(args.Data);
+
+		foreach (JProperty property in jsonObject.Properties())
+		{
+			if(property.Name == "topic")
+			{
+				topic = property.Value.ToString();
+				continue;
+			}
+		}
+		
+		try
+		{
+			callbacks[topic](args.Data);
+		}
+		catch(KeyNotFoundException)
+		{
+			Debug.Log("Could not find the topic registered!");
+		}
+	}
+
+	public void MessageReceived(string data)
+	{
+		string topic = "";
+		JObject jsonObject = JObject.Parse(data);
+
+		foreach (JProperty property in jsonObject.Properties())
+		{
+			if (property.Name == "topic")
+			{
+				topic = property.Value.ToString();
+				continue;
+			}
+		}
+
+		try
+		{
+			callbacks[topic](data);
+		}
+		catch (KeyNotFoundException)
+		{
+			Debug.Log("Could not find the topic registered!");
+		}
+	}
+
 }

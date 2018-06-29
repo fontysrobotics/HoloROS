@@ -12,13 +12,11 @@ namespace RosTypes
         public string topic;
         public RosMsg msg;
 
-        public PublishMessage(string op, string topic, RosMsg msg)
-        {
-            this.op = op;
-            this.topic = topic;
-            this.msg = msg;
-
-        }
-
+		public PublishMessage(string op, string topic, RosMsg msg)
+		{
+			this.op = op;
+			this.topic = topic;
+			this.msg = msg;
+		}
     }
 }
