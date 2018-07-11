@@ -11,8 +11,8 @@ public class TurtleSimConnection : MonoBehaviour
 {
 	public Text text;
 	private string t;
-	public Integer linear;
-	public Integer angular;
+	public Double linear;
+	public Double angular;
 	
 	private RosConnection ros;
 
@@ -58,8 +58,8 @@ public class TurtleSimConnection : MonoBehaviour
 		geometry_msgs_twist t = new geometry_msgs_twist();
 		geometry_msgs_vector3 linearVector = new geometry_msgs_vector3();
 		geometry_msgs_vector3 angularVector = new geometry_msgs_vector3();
-		linearVector.x = linear.integer;
-		angularVector.z = angular.integer;
+		linearVector.x = linear.d;
+		angularVector.z = angular.d;
 		t.linear = linearVector;
 		t.angular = angularVector;
 		return t;

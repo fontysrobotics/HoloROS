@@ -1,5 +1,5 @@
 ﻿#if !UNITY_EDITOR
-namespace UWPHoloLens
+namespace WebsocketHoloLens
 {
 	using System;
 	using UnityEngine;

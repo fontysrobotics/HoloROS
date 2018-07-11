@@ -7,9 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RosTypes;
 
-
-
-public class Ur3Connection : MonoBehaviour {
+public class Ur5Connection : MonoBehaviour {
 
 	private RosConnection ros;
 
@@ -61,7 +59,7 @@ public class Ur3Connection : MonoBehaviour {
 					{
 						case "joint1":
 							{
-								rotations[0].z = degrees + 45;
+								rotations[0].z = 0-(degrees + 45);
 								break;
 							}
 						case "joint2":
@@ -81,7 +79,7 @@ public class Ur3Connection : MonoBehaviour {
 							}
 						case "joint5":
 							{
-								rotations[4].z = degrees;
+								rotations[4].z = 0-(degrees);
 								break;
 							}
 						case "joint6":
@@ -103,6 +101,7 @@ public class Ur3Connection : MonoBehaviour {
 	// Create the list of GameObjects that represent each joint of the robot
 	void initializeJoints()
 	{
+
 		var RobotChildren = RobotBase.GetComponentsInChildren<Transform>();
 		for (int i = 0; i < RobotChildren.Length; i++)
 		{

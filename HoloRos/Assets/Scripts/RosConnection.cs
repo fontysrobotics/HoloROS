@@ -7,16 +7,17 @@ using Newtonsoft.Json.Linq;
 using RosTypes;
 
 #if UNITY_EDITOR
-using UWPEditor;
+using WebsocketEditor;
 #endif
 
 #if !UNITY_EDITOR
-using UWPHoloLens;
+using WebsocketHoloLens;
 #endif
 
 public class RosConnection
 {
-	private const string url = "ws://145.93.173.18:9090";
+	//private const string url = "ws://145.93.173.18:9090";
+	private const string url = "ws://192.168.137.54:9090";
 	private WebsocketConnection connection;
 
 	private Dictionary<string, CallbackDelegate> callbacks;
@@ -44,7 +45,7 @@ public class RosConnection
 	{
 		callbacks.Add(topic, cb);
 
-		SubscribeMessage s = new SubscribeMessage("subscribe", topic);
+		SubscribeMessage s = new SubscribeMessage(topic);
 		s.throttle_rate = throttle;
 		string json = JsonConvert.SerializeObject(s);
 
@@ -53,11 +54,12 @@ public class RosConnection
 
 	public void Publish(RosMsg msg, string topic)
 	{
-		PublishMessage p = new PublishMessage("publish", topic, msg);
+		PublishMessage p = new PublishMessage(topic, msg);
 		string json = JsonConvert.SerializeObject(p);
 		connection.Send(json);
 	}
 
+#if UNITY_EDITOR
 	public void MessageReceived(object e, WebSocketSharp.MessageEventArgs args)
 	{
 		string topic = "";
@@ -81,7 +83,7 @@ public class RosConnection
 			Debug.Log("Could not find the topic registered!");
 		}
 	}
-
+#elif !UNITY_EDITOR
 	public void MessageReceived(string data)
 	{
 		string topic = "";
@@ -105,5 +107,5 @@ public class RosConnection
 			Debug.Log("Could not find the topic registered!");
 		}
 	}
-
+#endif
 }

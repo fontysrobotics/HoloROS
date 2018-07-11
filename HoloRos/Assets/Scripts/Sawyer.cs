@@ -6,20 +6,6 @@ using UnityEngine.UI;
 public class Sawyer : MonoBehaviour 
 {
 	private string[] SawyerData;
-	private string Payload;
-	private string MaxReach;
-	private string TaskRepeatability;
-	private string ToolSpeed;
-	private string DOF;
-	private string OperatingTemp;
-	private string JointRanges;
-	private string RobotWeight;
-	private string PowerRequirements;
-	private string BoxIO;
-	private string Communication;
-	private string IPClass;
-	private string CollaborativeStandards;
-	private string EndOfArmIO;
 	
 	public Text[] UIElements;
 
@@ -49,6 +35,5 @@ public class Sawyer : MonoBehaviour
 		{
 			UIElements[i].text = SawyerData[i];
 		}
-		
 	}
 }

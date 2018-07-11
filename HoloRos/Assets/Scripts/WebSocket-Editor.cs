@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR
-namespace UWPEditor
+namespace WebsocketEditor
 {
 	using System;
 	using UnityEngine;
