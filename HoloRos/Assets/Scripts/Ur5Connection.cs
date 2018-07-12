@@ -14,6 +14,7 @@ public class Ur5Connection : MonoBehaviour {
 	private GameObject[] jointList = new GameObject[6];
 	private Vector3[] rotations = new Vector3[6];
 	public GameObject RobotBase;
+	public GameObject endEffector;
 
 	// Use this for initialization
 	void Start() {
@@ -30,6 +31,20 @@ public class Ur5Connection : MonoBehaviour {
 		{
 			jointList[i].transform.localEulerAngles = rotations[i];
 		}
+	}
+
+	public void MoveArm()
+	{
+		simpleEndEffector transform = new simpleEndEffector();
+		transform.posx = endEffector.transform.position.x - RobotBase.transform.position.x;
+		transform.posy = endEffector.transform.position.y - RobotBase.transform.position.y;
+		transform.posz = endEffector.transform.position.z - RobotBase.transform.position.z;
+		transform.roll = endEffector.transform.rotation.eulerAngles.x - RobotBase.transform.rotation.eulerAngles.x;
+		transform.pitch = endEffector.transform.rotation.eulerAngles.y - RobotBase.transform.rotation.eulerAngles.y;
+		transform.yaw = endEffector.transform.rotation.eulerAngles.z - RobotBase.transform.rotation.eulerAngles.z;
+
+		ros.Publish(transform, "/move_ur/setEndEffectorSimple");
+
 	}
 
 	public void MessageReceived(string data)

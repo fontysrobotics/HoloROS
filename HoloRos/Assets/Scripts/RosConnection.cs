@@ -16,8 +16,8 @@ using WebsocketHoloLens;
 
 public class RosConnection
 {
-	//private const string url = "ws://145.93.173.18:9090";
-	private const string url = "ws://192.168.137.54:9090";
+	private const string url = "ws://145.93.118.128:9090";
+	//private const string url = "ws://192.168.137.54:9090";
 	private WebsocketConnection connection;
 
 	private Dictionary<string, CallbackDelegate> callbacks;
